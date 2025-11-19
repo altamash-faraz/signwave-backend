@@ -8,8 +8,7 @@ A REST API for real-time sign language recognition with text-to-speech functiona
 - **Hand Landmark Detection**: Real-time hand tracking using MediaPipe
 - **Text-to-Speech**: Converts recognized text to natural speech
 - **REST API**: Complete RESTful endpoints for frontend integration
-- **CORS Enabled**: Ready for web frontend integration
-
+- 
 ## 📋 API Endpoints
 
 ### Health Check
