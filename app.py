@@ -32,38 +32,32 @@ MAX_HANDS = int(os.getenv('MAX_HANDS', '2'))
 model = None
 labels_map = None
 idx_to_label = None
-mp_hands = None
-mp_drawing = None
-mp_styles = None
 tts_engine = None
 
+# MediaPipe globals (set at module level)
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
+mp_styles = mp.solutions.drawing_styles
+
 def init_model():
-    """Initialize the model and MediaPipe components"""
-    global model, labels_map, idx_to_label, mp_hands, mp_drawing, mp_styles, tts_engine
-    
+    global model, labels_map, idx_to_label, tts_engine
     try:
         # Load TensorFlow model
         model = tf.keras.models.load_model(MODEL_PATH)
         print(f"✅ Model loaded from {MODEL_PATH}")
-        
+
         # Load labels
         with open(LABELS_PATH, "r") as f:
             labels_map = json.load(f)
         idx_to_label = {v: k for k, v in labels_map.items()}
         print(f"✅ Labels loaded: {len(labels_map)} classes")
-        
-        # Initialize MediaPipe
-        mp_hands = mp.solutions.hands
-        mp_drawing = mp.solutions.drawing_utils
-        mp_styles = mp.solutions.drawing_styles
-        print("✅ MediaPipe initialized")
-        
+
         # Initialize TTS engine
         tts_engine = pyttsx3.init()
-        tts_engine.setProperty('rate', 150)  # Speed of speech
-        tts_engine.setProperty('volume', 0.9)  # Volume level (0.0 to 1.0)
+        tts_engine.setProperty('rate', 150)
+        tts_engine.setProperty('volume', 0.9)
         print("✅ TTS engine initialized")
-        
+
         return True
     except Exception as e:
         print(f"❌ Error initializing model: {str(e)}")
