@@ -54,16 +54,29 @@ def init_model():
         mp_hands = mp.solutions.hands
         print("✅ MediaPipe initialized")
 
-        # Init TTS
-        tts_engine = pyttsx3.init()
-        tts_engine.setProperty('rate', 150)
-        tts_engine.setProperty('volume', 0.9)
-        print("✅ TTS engine initialized")
+        # Init TTS (skip if not available on server)
+        try:
+            tts_engine = pyttsx3.init()
+            tts_engine.setProperty('rate', 150)
+            tts_engine.setProperty('volume', 0.9)
+            print("✅ TTS engine initialized")
+        except Exception as tts_error:
+            print(f"⚠️  TTS not available (normal on servers): {str(tts_error)}")
+            tts_engine = None
 
         return True
     except Exception as e:
         print(f"❌ Error initializing model: {str(e)}")
         return False
+
+
+# Initialize model at module level (runs on import - works with Gunicorn)
+print("🚀 Starting SignWave Backend API...")
+init_success = init_model()
+if init_success:
+    print(f"✅ Initialization complete - {len(labels_map)} gesture classes loaded")
+else:
+    print("⚠️  Model initialization incomplete - some features may not work")
 
 
 def extract_hand_features(img_bgr, hands_detector, max_hands=2):
@@ -277,15 +290,9 @@ def get_labels():
 
 
 # ------------------------------------------------------
-# MAIN ENTRY POINT (Render)
+# MAIN ENTRY POINT (for local development with `python app.py`)
 # ------------------------------------------------------
 if __name__ == '__main__':
-    print("🚀 Starting SignWave Backend API...")
-
-    if not init_model():
-        print("❌ Failed to initialize model. Exiting.")
-        exit(1)
-
     port = int(os.environ.get("PORT", 8000))
-    print(f"🔥 Server running on port {port}")
-    app.run(host='0.0.0.0', port=port)
+    print(f"🔥 Development server running on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=True)
